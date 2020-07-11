@@ -1,5 +1,5 @@
 provider "aws" {
-  region  = "us-east-1"
+  region  = "${var.region}"
 }
 
 data "aws_ami" "ubuntu" {
@@ -21,7 +21,7 @@ data "aws_ami" "ubuntu" {
 resource "aws_instance" "web" {
   ami           = "${data.aws_ami.ubuntu.id}"
   instance_type = "t2.micro"
-
+  availability_zone = "${var.region}a"
   tags = "${var.tags}"
 }
 
@@ -35,8 +35,20 @@ resource "aws_route53_record" "www" {
 
 
 resource "aws_instance" "web2" {
-    ami           = "${data.aws_ami.ubuntu.id}"
+  ami           = "${data.aws_ami.ubuntu.id}"
   instance_type = "t2.micro"
-
+  availability_zone = "${var.region}a"
   tags = "${var.tags}"
+}
+
+resource "aws_ebs_volume" "example" {
+  availability_zone = "${var.region}a"
+  size              = 100
+  tags = "${var.tags}"
+}
+
+resource "aws_volume_attachment" "ebs_att" {
+  device_name = "/dev/sdh"
+  volume_id   = "${aws_ebs_volume.example.id}"
+  instance_id = "${aws_instance.web2.id}"
 }

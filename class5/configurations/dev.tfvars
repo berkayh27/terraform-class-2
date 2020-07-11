@@ -1,3 +1,5 @@
+region = "us-east-1"
+
 tags = {
     Env                 = "Development"
     Billing             = "SMA"
